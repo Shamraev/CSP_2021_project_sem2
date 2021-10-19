@@ -3,6 +3,7 @@
 #include <QQmlContext>
 
 #include "./lib/controllerbackend.h"
+#include "./Controller/controller.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,6 +12,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     ControllerBackend controllerBackend(50, "Zsdnw82iuw");
+    Controller controller;
 
     QQmlApplicationEngine engine;
 
@@ -23,8 +25,8 @@ int main(int argc, char *argv[])
 
     engine.rootContext()->setContextProperty("plant", &controllerBackend);
 
-//    QObject::connect(&controllerBackend, &ControllerBackend::outputBytesChanged,
-//                     &testController, &TestController::computeBytes);
+    QObject::connect(&controllerBackend, &ControllerBackend::outputBytesChanged,
+                     &controller, &Controller::computeBytes);
 
 //    QObject::connect(&testController, &TestController::computed,
 //                     &controllerBackend, &ControllerBackend::setInput);

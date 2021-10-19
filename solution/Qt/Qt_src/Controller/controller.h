@@ -1,5 +1,5 @@
-#ifndef TESTCONTROLLER_H
-#define TESTCONTROLLER_H
+#ifndef CONTROLLER_H
+#define CONTROLLER_H
 
 #include <QObject>
 #include <QTimer>
@@ -7,11 +7,11 @@
 #include <QtMath>
 #include <QDateTime>
 
-class TestController : public QObject
+class Controller : public QObject
 {
     Q_OBJECT
 public:
-    explicit TestController(QObject *parent = nullptr);
+    explicit Controller(QObject *parent = nullptr);
 
 public slots:
 
@@ -27,7 +27,9 @@ signals:
 private:
 
     QDateTime m_lastMeasure;
+    float m_seconds;
+    long m_n;
 
 };
 
-#endif // TESTCONTROLLER_H
+#endif // CONTROLLER_H
