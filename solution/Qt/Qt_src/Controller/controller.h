@@ -28,7 +28,7 @@ private:
 
     QDateTime m_lastMeasure;
     float m_seconds;
-    long m_n;
+    long m_n, m_corM;
 
 };
 
