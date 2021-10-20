@@ -5,6 +5,19 @@ Controller::Controller(QObject *parent) : QObject(parent)
     m_seconds = 0;
     m_n = 0;
     m_corM = 0;
+
+    m_file = new QFile(QDateTime::currentDateTime().toString("hh_MM_ss"));
+    if (!(m_file->open(QIODevice::WriteOnly))){
+        qDebug() << "Failed to open log file";
+    }
+    m_stream = new QTextStream(m_file);
+}
+
+Controller::~Controller()
+{
+    m_file->close();
+    delete m_stream;
+    delete m_file;
 }
 
 void Controller::compute(float value, float seconds, float referenceSignal)
@@ -49,6 +62,9 @@ void Controller::computeBytes(QByteArray message)
     float q, refLevel;
     memcpy(&q, message.data() + 2, 4);
     memcpy(&refLevel, message.data() + 6, 4);
+    if (refLevel<0) {refLevel = 0;}
     qDebug() << "q coordinate of plant: " << q << ", reference level: " << refLevel;
 
+    // Saving q and refLevel to the file for Matlab
+    *m_stream << q << " " << refLevel << "\n";
 }

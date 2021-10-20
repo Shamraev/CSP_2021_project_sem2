@@ -6,12 +6,15 @@
 #include <QDebug>
 #include <QtMath>
 #include <QDateTime>
+#include <QFile>
+#include <QTextStream>
 
 class Controller : public QObject
 {
     Q_OBJECT
 public:
     explicit Controller(QObject *parent = nullptr);
+    ~Controller();
 
 public slots:
 
@@ -29,6 +32,8 @@ private:
     QDateTime m_lastMeasure;
     float m_seconds;
     long m_n, m_corM;
+    QFile* m_file;
+    QTextStream* m_stream;
 
 };
 
