@@ -28,8 +28,8 @@ int main(int argc, char *argv[])
     QObject::connect(&controllerBackend, &ControllerBackend::outputBytesChanged,
                      &controller, &Controller::computeBytes);
 
-//    QObject::connect(&testController, &TestController::computed,
-//                     &controllerBackend, &ControllerBackend::setInput);
+    QObject::connect(&controller, &Controller::computed,
+                     &controllerBackend, &ControllerBackend::setInput);
 
     engine.load(url);
 

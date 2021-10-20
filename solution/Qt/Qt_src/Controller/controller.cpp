@@ -32,9 +32,9 @@ Controller::~Controller()
 
 void Controller::compute(float value, float seconds, float referenceSignal)
 {
-    //emit computed((referenceSignal - value) * 10);
-    //emit computed(referenceSignal);
-    //emit computed(50 + 50 * qSin(QDateTime::currentMSecsSinceEpoch() / 1000));
+    emit computed((referenceSignal - value) * 10);
+    emit computed(referenceSignal);
+    emit computed(50 + 50 * qSin(seconds));
 }
 
 void Controller::computeBytes(QByteArray message)
@@ -75,9 +75,12 @@ void Controller::computeBytes(QByteArray message)
     if (refLevel<0) {refLevel = 0;}
     qDebug() << "q coordinate of plant: " << q << ", reference level: " << refLevel;
 
-    // Saving q and refLevel to the file for Matlab
+    // Saving q, refLevel, and t to the file for Matlab
     if (m_n==1)
-        *m_stream << q << " " << refLevel;
+        *m_stream << q << " " << refLevel << " " << m_seconds;
     else
-        *m_stream << "\n" << q << " " << refLevel;
+        *m_stream << "\n" << q << " " << refLevel << " " << m_seconds;
+
+    // Send u to object
+    compute(q, m_seconds, refLevel);
 }
