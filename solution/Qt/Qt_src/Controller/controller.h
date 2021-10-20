@@ -8,6 +8,7 @@
 #include <QDateTime>
 #include <QFile>
 #include <QTextStream>
+#include <QDir>
 
 class Controller : public QObject
 {

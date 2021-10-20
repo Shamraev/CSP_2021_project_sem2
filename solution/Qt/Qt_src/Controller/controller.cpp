@@ -6,7 +6,17 @@ Controller::Controller(QObject *parent) : QObject(parent)
     m_n = 0;
     m_corM = 0;
 
-    m_file = new QFile(QDateTime::currentDateTime().toString("hh_MM_ss"));
+    // Log file
+    QString path("logs/");
+    QDir dir; // Initialize to the desired dir if 'path' is relative
+              // By default the program's working directory "." is used.
+
+    // We create the directory if needed
+    if (!dir.exists(path))
+        dir.mkpath(path); // You can check the success if needed
+
+
+    m_file = new QFile(path + QDateTime::currentDateTime().toString("hh_MM_ss"));
     if (!(m_file->open(QIODevice::WriteOnly))){
         qDebug() << "Failed to open log file";
     }
@@ -66,5 +76,8 @@ void Controller::computeBytes(QByteArray message)
     qDebug() << "q coordinate of plant: " << q << ", reference level: " << refLevel;
 
     // Saving q and refLevel to the file for Matlab
-    *m_stream << q << " " << refLevel << "\n";
+    if (m_n==1)
+        *m_stream << q << " " << refLevel;
+    else
+        *m_stream << "\n" << q << " " << refLevel;
 }
