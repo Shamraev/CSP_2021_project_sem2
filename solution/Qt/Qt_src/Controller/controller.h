@@ -19,14 +19,16 @@ public:
 
 public slots:
 
-    void compute(float value, float seconds, float referenceSignal);
+    float computeU(float value, float seconds, float referenceSignal);
+    float computeReferenceSignal(float value, float seconds);
 
     void computeBytes(QByteArray message);
 
 
 signals:
 
-    void computed(float value);
+    void generatedInput(float value);
+    void generatedReference(float value);
 
 private:
 

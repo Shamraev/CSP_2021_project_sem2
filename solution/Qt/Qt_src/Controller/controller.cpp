@@ -30,11 +30,17 @@ Controller::~Controller()
     delete m_file;
 }
 
-void Controller::compute(float value, float seconds, float referenceSignal)
+float Controller::computeU(float value, float seconds, float referenceSignal)
 {
-    emit computed((referenceSignal - value) * 10);
-    emit computed(referenceSignal);
-    emit computed(50 + 50 * qSin(seconds));
+//    emit computed((referenceSignal - value) * 10);
+//    emit computed(referenceSignal);
+//    emit computed(50 + 50 * qSin(seconds));
+    return (referenceSignal - value) * 10;
+}
+
+float Controller::computeReferenceSignal(float value, float seconds)
+{
+    return 50 + 10 * qSin(seconds);
 }
 
 void Controller::computeBytes(QByteArray message)
@@ -75,12 +81,17 @@ void Controller::computeBytes(QByteArray message)
     if (refLevel<0) {refLevel = 0;}
     qDebug() << "q coordinate of plant: " << q << ", reference level: " << refLevel;
 
-    // Saving q, refLevel, and t to the file for Matlab
-    if (m_n==1)
-        *m_stream << q << " " << refLevel << " " << m_seconds;
-    else
-        *m_stream << "\n" << q << " " << refLevel << " " << m_seconds;
+    // Generate and send a reference signal to an object
+    float gen_refLevel = computeReferenceSignal(q, m_seconds);
+    emit generatedReference(gen_refLevel);
 
     // Send u to object
-    compute(q, m_seconds, refLevel);
+    float u = computeU(q, m_seconds, refLevel);
+    emit generatedInput(u);
+
+    // Saving q, refLevel, and t to the file for Matlab
+    if (m_n==1)
+        *m_stream << q << " " << refLevel << " " << u << " " << m_seconds;
+    else
+        *m_stream << "\n" << q << " " << refLevel << " " << u << " " << m_seconds;
 }
