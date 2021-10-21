@@ -1,10 +1,14 @@
 #include "controller.h"
 
+using namespace std;
+
 Controller::Controller(QObject *parent) : QObject(parent)
 {
     m_seconds = 0;
     m_n = 0;
     m_corM = 0;
+    m_q_filter = new LowPassFilter(2.0e-4);
+    m_pid = new PID(22.07, 24.3, 4.493, 0);
 
     // Log file
     QString path("logs/");
@@ -28,30 +32,32 @@ Controller::~Controller()
     m_file->close();
     delete m_stream;
     delete m_file;
+    delete m_q_filter;
+    delete m_pid;
 }
 
-float Controller::computeU(float value, float seconds, float referenceSignal)
+float Controller::computeU(float q, float dt, float referenceSignal)
 {
-//    emit computed((referenceSignal - value) * 10);
-//    emit computed(referenceSignal);
-//    emit computed(50 + 50 * qSin(seconds));
-    return (referenceSignal - value) * 10;
+    float u = m_pid->compute(referenceSignal-q, dt);
+    return u;
 }
 
-float Controller::computeReferenceSignal(float value, float seconds)
+float Controller::computeReferenceSignal(float q, float t)
 {
-    return 50 + 10 * qSin(seconds);
+    return 70 - 10*exp(-0.1*t)*((-pow((t-2),2)+60*t)/100)*sin(t/2);
 }
 
 void Controller::computeBytes(QByteArray message)
 {
     m_n += 1;
+    float dt = 0;
     if (m_lastMeasure.isNull()) {
 
     } else {
         QDateTime currentDateTime = QDateTime::currentDateTime();
 
-        m_seconds += m_lastMeasure.msecsTo(currentDateTime) / 1000.0;
+        dt = m_lastMeasure.msecsTo(currentDateTime) / 1000.0;
+        m_seconds += dt;
     }
 
     m_lastMeasure = QDateTime::currentDateTime();
@@ -86,12 +92,13 @@ void Controller::computeBytes(QByteArray message)
     emit generatedReference(gen_refLevel);
 
     // Send u to object
-    float u = computeU(q, m_seconds, refLevel);
+    float q_filt = m_q_filter->Update(q, dt);
+    float u = computeU(q_filt, dt, refLevel);
     emit generatedInput(u);
 
     // Saving q, refLevel, and t to the file for Matlab
     if (m_n==1)
-        *m_stream << q << " " << refLevel << " " << u << " " << m_seconds;
+        *m_stream << q << " " << refLevel << " " << u << " " << m_seconds << " " << q_filt;
     else
-        *m_stream << "\n" << q << " " << refLevel << " " << u << " " << m_seconds;
+        *m_stream << "\n" << q << " " << refLevel << " " << u << " " << m_seconds << " " << q_filt;
 }

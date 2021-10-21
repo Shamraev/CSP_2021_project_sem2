@@ -15,7 +15,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         Controller/controller.cpp \
-        main.cpp
+        lowpassfilter/lowpassfilter.cpp \
+        main.cpp \
+        pid/pid.cpp
 
 RESOURCES += qml.qrc
 
@@ -38,5 +40,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-            Controller/controller.h
+            Controller/controller.h \
+            lowpassfilter/lowpassfilter.h \
+            pid/pid.h
 

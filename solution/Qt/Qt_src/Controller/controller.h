@@ -9,6 +9,8 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDir>
+#include "lowpassfilter/lowpassfilter.h"
+#include "pid/pid.h"
 
 class Controller : public QObject
 {
@@ -19,8 +21,8 @@ public:
 
 public slots:
 
-    float computeU(float value, float seconds, float referenceSignal);
-    float computeReferenceSignal(float value, float seconds);
+    float computeU(float value, float dt, float referenceSignal);
+    float computeReferenceSignal(float value, float t);
 
     void computeBytes(QByteArray message);
 
@@ -37,6 +39,8 @@ private:
     long m_n, m_corM;
     QFile* m_file;
     QTextStream* m_stream;
+    LowPassFilter* m_q_filter;
+    PID* m_pid;
 
 };
 
